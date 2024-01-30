@@ -115,6 +115,7 @@ void EventLoop::queueInLoop(Functor cb)
     }
 
     // 唤醒相应的需要执行上面回调操作的loop线程
+    // || m_callingPendingFunctors 的作用是：当前的loop正在执行回调，但是loop中又来了新的回调，那么为了避免当前loop执行完后阻塞，使用wakeup将其唤醒来执行该回调
     if(!isInLoopThread() || m_callingPendingFunctors)
     {
         wakeup();  // 唤醒loop所在线程
@@ -128,7 +129,7 @@ void EventLoop::wakeup()
     ssize_t n = ::write(m_wakeupfd,&one,sizeof(one));
     if(n != sizeof(one))
     {
-        LOG_ERROR("EventLoop::wakeup() writes %d bytes instead of 8\n",one);
+        LOG_ERROR("EventLoop::wakeup() writes %lu bytes instead of 8\n",one);
     }
 }
 
@@ -153,7 +154,7 @@ void EventLoop::handleRead()
     ssize_t n = read(m_wakeupfd,&one,sizeof(one));
     if( n != sizeof(one))
     {
-        LOG_ERROR("EventLoop::handleRead() reads %d bytes instead of 8\n",one);
+        LOG_ERROR("EventLoop::handleRead() reads %lu bytes instead of 8\n",one);
     }
 }
 
@@ -168,7 +169,7 @@ void EventLoop::doPendingFunctors()
 
     for(const Functor &functor : functors)
     {
-        functor();
+        functor();    // 执行当前loop需要回调的操作
     }
     m_callingPendingFunctors = false;
 }
