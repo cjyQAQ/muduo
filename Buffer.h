@@ -70,6 +70,8 @@ public:
 
     // 从fd中读数据
     ssize_t readFd(int fd,int *saveErrno);
+    // 通过fd发送数据
+    ssize_t writeFd(int fd,int *saveErrno);
 private:
     void makeSpace(size_t len)
     {
