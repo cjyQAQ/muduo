@@ -5,6 +5,10 @@ Poller::Poller(EventLoop *loop):m_ownerLoop(loop)
 {
 }
 
+Poller::~Poller()
+{
+}
+
 bool Poller::hsaChannel(Channel *channel) const
 {
     auto it = m_channels.find(channel->fd());

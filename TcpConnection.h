@@ -19,7 +19,7 @@ class EventLoop;
 class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnection>
 {
 public:
-    TcpConnection(EventLoop *loop,const std::string &name,int sockfd,const InetAddress &localAddr,InetAddress &peerAddr);
+    TcpConnection(EventLoop *loop,const std::string &name,int sockfd,const InetAddress &localAddr,const InetAddress &peerAddr);
     ~TcpConnection();
 
     EventLoop *getLoop() const { return m_loop; }
@@ -30,7 +30,7 @@ public:
     bool connected() const { return m_state == kConnected; }
     
     // 发送数据
-    void send(const void *message,int len);
+    void send(const std::string &buf);
     //关闭连接
     void shutdown();
 
@@ -57,7 +57,7 @@ private:
     void handleClose();
     void handleError();
 
-    void sendInLoop(const void *message,size_t len);
+    void sendInLoop(const void *data,size_t len);
     void shutdownInLoop();
 
     void setState(StateE state) { m_state = state; }
@@ -81,7 +81,7 @@ private:
 
     size_t m_highWaterMark;
     
-    Buffer m_inputBuffer;
-    Buffer m_outputBuffer;
+    Buffer m_inputBuffer;   // 接收数据
+    Buffer m_outputBuffer;  // 发送数据
 };
 

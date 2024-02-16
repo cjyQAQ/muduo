@@ -63,7 +63,7 @@ void EventLoop::loop()
     m_quit = false;
     LOG_INFO("EventLoop %p start looping\n",this);
 
-    while(m_quit)
+    while(!m_quit)
     {
         m_activeChannels.clear();
         // 监听两类fd，一种是clientfd，一种是wakeupfd

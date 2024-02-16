@@ -13,6 +13,10 @@ Buffer::Buffer(size_t initialsize)
 
 }
 
+Buffer::~Buffer()
+{
+}
+
 // POLLER工作在LT模式 Buffer有大小，但是从fd中读数据的时候，却不知道tcp数据最终大小
 ssize_t Buffer::readFd(int fd, int *saveErrno)
 {

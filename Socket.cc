@@ -21,7 +21,7 @@ void Socket::bindAddress(const InetAddress &localaddr)
 
 void Socket::listen()
 {
-    if(1 != ::listen(m_sockfd,1024))
+    if(0 != ::listen(m_sockfd,1024))
     {
         LOG_FATAL("listen sockfd:%d fail\n",m_sockfd);
     }
@@ -29,10 +29,16 @@ void Socket::listen()
 
 int Socket::accept(InetAddress *peeraddr)
 {
+    /**
+     * 1. accept函数的参数不合法
+     * 2. 对返回的connfd没有设置非阻塞
+     * Reactor模型 one loop per thread
+     * poller + non-blocking IO
+     */ 
     struct sockaddr_in addr;
-    socklen_t len;
+    socklen_t len = sizeof(addr);
     bzero(&addr,sizeof(addr));
-    int clientfd = ::accept(m_sockfd,(sockaddr *)&addr,&len);
+    int clientfd = ::accept4(m_sockfd,(sockaddr *)&addr,&len,SOCK_NONBLOCK | SOCK_CLOEXEC);
     if(clientfd >= 0)
     {
         peeraddr->setSockAddr(addr);
